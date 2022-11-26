@@ -1,5 +1,7 @@
 package study.querydsl;
 
+import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,5 +84,36 @@ public class QuerydslBasicTest {
                 )
                 .fetchOne();
         assertThat(findMember.getUsername()).isEqualTo("member1");
+    }
+    @Test
+    public void resultFetch(){
+//        List<Member> fetch = queryFactory
+//                .selectFrom(member)
+//                .fetch();
+//
+//        Member fetchOne = queryFactory
+//                .selectFrom(member)
+//                .fetchOne();
+//
+//        Member fetchFirst = queryFactory
+//                .selectFrom(member)
+//                .fetchFirst();
+
+//        QueryResults<Member> results = queryFactory
+//                .selectFrom(member)
+//                .fetchResults();
+//
+//        results.getTotal();
+//        List<Member> content = results.getResults();
+
+//        long total = queryFactory
+//                .selectFrom(member)
+//                .fetchCount();
+        //fetchCount()는 향후 Querydsl에서 지원하지 않기로 결정해서 count처리는 아래처럼 하면 된다.
+        Long total = queryFactory
+//                .select(Wildcard.count) //select count(*)
+                .select(member.count()) //select count(member.id)
+                .from(member)
+                .fetchOne();
     }
 }
