@@ -51,7 +51,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
 
     @Override
     public Page<MemberTeamDto> searchPageSimple(MemberSearchCondition condition, Pageable pageable) {
-        QueryResults<MemberTeamDto> results = queryFactory
+        List<MemberTeamDto> content = queryFactory
                 .select(new QMemberTeamDto(
                         member.id.as("memberId"),
                         member.username,
@@ -69,12 +69,9 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .fetchResults();
+                .fetch();
 
-        List<MemberTeamDto> content = results.getResults();
-        long total = results.getTotal();
-
-        return new PageImpl<>(content,pageable,total);
+        return new PageImpl<>(content,pageable,content.size());
     }
 
     @Override
@@ -99,8 +96,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        JPAQuery<Member> countQuery = queryFactory
-                .select(member)
+        JPAQuery<Long> countQuery = queryFactory
+                .select(member.count())
                 .from(member)
                 .leftJoin(member.team, team)
                 .where(
@@ -110,7 +107,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
                         ageLoe(condition.getAgeLoe())
                 );
 //        return new PageImpl<>(content,pageable,total);
-        return PageableExecutionUtils.getPage(content,pageable, countQuery::fetchCount);
+        return PageableExecutionUtils.getPage(content,pageable, countQuery::fetchOne);
     }
 
     private BooleanExpression usernameEq(String username) {
